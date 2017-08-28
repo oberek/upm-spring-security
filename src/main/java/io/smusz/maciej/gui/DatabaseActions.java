@@ -43,7 +43,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import io.smusz.maciej.crypto.CryptoException;
-import io.smusz.maciej.cryptoInvalidPasswordException;
+import io.smusz.maciej.crypto.InvalidPasswordException;
 import io.smusz.maciej.database.AccountInformation;
 import io.smusz.maciej.database.AccountsCSVMarshaller;
 import io.smusz.maciej.database.ExportException;
@@ -167,7 +167,7 @@ public class DatabaseActions {
                     try {
                         dbPers.load(database.getDatabaseFile(), password);
                         passwordCorrect = true;
-                    } catch (InvalidPasswordException e) {
+                    } catch (Exception e) {
                         JOptionPane.showMessageDialog(mainWindow, Translator.translate("incorrectPassword"));
                     }
                 }

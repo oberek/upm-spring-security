@@ -127,30 +127,34 @@ public class PasswordDatabasePersistence {
 
                 //Attempt to decrypt the io.smusz.maciej.database information
                 byte[] decryptedBytes;
-                decryptedBytes = encryptionService.decrypt(encryptedBytes);
-
-                //If we've got here then the io.smusz.maciej.database was successfully decrypted
-                is = new ByteArrayInputStream(decryptedBytes);
                 try {
-                    revision = new Revision(is);
-                    dbOptions = new DatabaseOptions(is);
-    
-                    // Read the remainder of the io.smusz.maciej.database in now
-                    accounts = new HashMap();
+                    decryptedBytes = encryptionService.decrypt(encryptedBytes);
+                    //If we've got here then the io.smusz.maciej.database was successfully decrypted
+                    is = new ByteArrayInputStream(decryptedBytes);
                     try {
-                        while (true) { //keep loading accounts until an EOFException is thrown
-                            AccountInformation ai = new AccountInformation(is, charset);
-                            accounts.put(ai.getAccountName(), ai);
-                        }
-                    } catch (EOFException e) {
-                        //just means we hit eof
-                    }
-                    is.close();
-                } catch (IOException e) {
-                    throw new ProblemReadingDatabaseFile(e.getMessage(), e);
-                }
+                        revision = new Revision(is);
+                        dbOptions = new DatabaseOptions(is);
 
-                passwordDatabase = new PasswordDatabase(revision, dbOptions, accounts, databaseFile);
+                        // Read the remainder of the io.smusz.maciej.database in now
+                        accounts = new HashMap();
+                        try {
+                            while (true) { //keep loading accounts until an EOFException is thrown
+                                AccountInformation ai = new AccountInformation(is, charset);
+                                accounts.put(ai.getAccountName(), ai);
+                            }
+                        } catch (EOFException e) {
+                            //just means we hit eof
+                        }
+                        is.close();
+                    } catch (IOException e) {
+                        throw new ProblemReadingDatabaseFile(e.getMessage(), e);
+                    }
+
+                    passwordDatabase = new PasswordDatabase(revision, dbOptions, accounts, databaseFile);
+                }
+                catch(Exception e){
+                    System.err.println("Problem decrypting the bytes.");
+                }
 
             } else {
                 throw new ProblemReadingDatabaseFile("Don't know how to handle io.smusz.maciej.database version [" + dbVersion + "]");
